@@ -1,6 +1,0 @@
-START 100
-   INC A 
-   HLT
-A  DC 5
-B  DC 10
-END

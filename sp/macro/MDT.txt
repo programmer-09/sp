@@ -1,4 +1,0 @@
-LDA &ARG1
-ADD #1
-STA &ARG1
-MEND
