@@ -1,0 +1,7 @@
+START 100
+ADD #1
+STA A
+   HLT
+A  DC 5
+B  DC 10
+END
