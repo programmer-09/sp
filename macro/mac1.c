@@ -15,12 +15,42 @@ typedef struct {
     char definition[50];
 } MDTEntry;
 
+typedef struct {
+    char arguments[MAX_ALA][10];  
+    int count;  
+} ALAEntry;
+
 MNTEntry MNT[MAX_MNT];  
 MDTEntry MDT[MAX_MDT];  
+ALAEntry ALA;  
 int mntCount = 0, mdtCount = 1;
 
 void storeMacroDefinition(char *line) {
     strcpy(MDT[mdtCount++].definition, line);
+}
+
+void saveALA() {
+    FILE *alaFile = fopen("ALA.txt", "w");
+    if (!alaFile) {
+        printf("Error opening ALA file.\n");
+        return;
+    }
+
+    for (int i = 0; i < ALA.count; i++) {
+        fprintf(alaFile, "%s\n", ALA.arguments[i]);
+    }
+
+    fclose(alaFile);
+}
+
+void extractArguments(char *line) {
+    char *token = strtok(line, " ,\n");
+    ALA.count = 0;
+
+    while (token) {
+        strcpy(ALA.arguments[ALA.count++], token);
+        token = strtok(NULL, " ,\n");
+    }
 }
 
 void processMacroDefinition(FILE *input, FILE *nonMacroFile) {
@@ -33,7 +63,8 @@ void processMacroDefinition(FILE *input, FILE *nonMacroFile) {
             MNT[mntCount].mdtIndex = mdtCount;
             mntCount++;
 
-            fgets(line, sizeof(line), input); 
+            fgets(line, sizeof(line), input);  
+            extractArguments(line);  
 
             while (fgets(line, sizeof(line), input)) {
                 if (strstr(line, "MEND")) {
@@ -43,7 +74,7 @@ void processMacroDefinition(FILE *input, FILE *nonMacroFile) {
                 storeMacroDefinition(line);  
             }
         } else {
-            fprintf(nonMacroFile, "%s", line);  // Write non-macro lines to nput.txt
+            fprintf(nonMacroFile, "%s", line);  
         }
     }
 }
@@ -84,6 +115,7 @@ int main() {
     fclose(nonMacroFile);
 
     saveTables();  
+    saveALA();  
     
     return 0;
 }
